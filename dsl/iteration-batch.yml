@@ -1,0 +1,269 @@
+app:
+  description: 問い合わせの配列を Iteration(並列)で分類する小さな例
+  icon: 🔁
+  icon_background: '#E4FBCC'
+  icon_type: emoji
+  mode: workflow
+  name: 'workflow: iteration-batch'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: start-source-split-target
+      source: start
+      sourceHandle: source
+      target: split
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: iteration
+      id: split-source-iteration-target
+      source: split
+      sourceHandle: source
+      target: iteration
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: iteration
+        sourceType: iteration-start
+        targetType: llm
+      id: iteration_start-source-classify-target
+      source: iteration_start
+      sourceHandle: source
+      target: classify
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: iteration
+        targetType: end
+      id: iteration-source-end-target
+      source: iteration
+      sourceHandle: source
+      target: end
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - label: questions
+          max_length: 4000
+          options: []
+          required: true
+          type: paragraph
+          variable: questions
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(text: str) -> dict:\n    lines = [line.strip() for line\
+          \ in text.splitlines()]\n    return {\"items\": [line for line in lines\
+          \ if line]}\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          items:
+            children: null
+            type: array[string]
+        selected: false
+        title: 'Code: split lines'
+        type: code
+        variables:
+        - value_selector:
+          - start
+          - questions
+          variable: text
+      height: 90
+      id: split
+      position:
+        x: 334
+        y: 300
+      positionAbsolute:
+        x: 334
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        error_handle_mode: continue-on-error
+        flatten_output: true
+        height: 220
+        is_parallel: true
+        iterator_input_type: array[string]
+        iterator_selector:
+        - split
+        - items
+        output_selector:
+        - classify
+        - text
+        output_type: array[string]
+        parallel_nums: 3
+        selected: false
+        start_node_id: iteration_start
+        title: Iteration
+        type: iteration
+        width: 620
+      height: 220
+      id: iteration
+      position:
+        x: 640
+        y: 240
+      positionAbsolute:
+        x: 640
+        y: 240
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 620
+      zIndex: 1
+    - data:
+        desc: ''
+        isInIteration: true
+        selected: false
+        title: ''
+        type: iteration-start
+      draggable: false
+      height: 48
+      id: iteration_start
+      parentId: iteration
+      position:
+        x: 24
+        y: 68
+      positionAbsolute:
+        x: 664
+        y: 308
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-iteration-start
+      width: 44
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: true
+        iteration_id: iteration
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: '社内の問い合わせを分類します。次の 4 つの候補から 1 つだけ選び、その文字列をそのまま出力してください。候補: 経費 / 勤怠
+            / IT / その他。説明や記号は付けません。'
+        - role: user
+          text: '{{#iteration.item#}}'
+        selected: false
+        title: 'LLM: classify'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: classify
+      parentId: iteration
+      position:
+        x: 128
+        y: 68
+      positionAbsolute:
+        x: 768
+        y: 308
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - split
+          - items
+          value_type: array[string]
+          variable: items
+        - value_selector:
+          - iteration
+          - output
+          value_type: array[string]
+          variable: categories
+        selected: false
+        title: Output
+        type: end
+      height: 90
+      id: end
+      position:
+        x: 1320
+        y: 300
+      positionAbsolute:
+        x: 1320
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.7
+  rag_pipeline_variables: []
+

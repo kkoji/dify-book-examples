@@ -1,0 +1,32 @@
+identity:
+  name: "office_hours"
+  author: "example"
+  label:
+    en_US: "office_hours"
+    ja_JP: "拠点の受付時間"
+description:
+  human:
+    en_US: "Return reception hours of an office."
+    ja_JP: "拠点の受付時間を返す。"
+  llm: "拠点名(tokyo / osaka)から受付時間を返す。社内の受付時間を聞かれたときに使う。"
+parameters:
+  - name: location
+    type: string
+    required: true
+    label:
+      en_US: Location
+      ja_JP: 拠点
+    human_description:
+      en_US: "Office location (tokyo / osaka)"
+      ja_JP: "拠点名(tokyo / osaka)"
+    llm_description: "拠点名。tokyo または osaka"
+    form: llm
+output_schema:
+  type: object
+  properties:
+    hours:
+      type: string
+      description: 受付時間
+extra:
+  python:
+    source: tools/office_hours.py

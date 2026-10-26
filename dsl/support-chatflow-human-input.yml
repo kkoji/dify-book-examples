@@ -1,0 +1,624 @@
+app:
+  description: needs_human のときに Human Input で担当者の確認を挟む Chatflow
+  icon: 🙋
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 'chatflow: support-chatflow-human-input'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables:
+  - description: 直近の問い合わせ種別
+    id: 5d5fd4e3-d21a-4b75-b9c6-4477e5cd7814
+    name: category
+    selector:
+    - conversation
+    - category
+    value: ''
+    value_type: string
+  - description: 担当者が回答案を確認したか
+    id: 90bf6497-9dd4-4081-a618-f4b318869c0c
+    name: confirmed
+    selector:
+    - conversation
+    - confirmed
+    value: false
+    value_type: boolean
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: question-classifier
+      id: start-source-classifier-target
+      source: start
+      sourceHandle: source
+      target: classifier
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: assigner
+      id: classifier-1-assign_cat-target
+      source: classifier
+      sourceHandle: '1'
+      target: assign_cat
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: assigner
+      id: classifier-2-assign_cat-target
+      source: classifier
+      sourceHandle: '2'
+      target: assign_cat
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: assigner
+      id: classifier-3-assign_cat-target
+      source: classifier
+      sourceHandle: '3'
+      target: assign_cat
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: assigner
+      id: classifier-4-assign_cat-target
+      source: classifier
+      sourceHandle: '4'
+      target: assign_cat
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: assign_cat-source-llm_draft-target
+      source: assign_cat
+      sourceHandle: source
+      target: llm_draft
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: llm_draft-source-normalize-target
+      source: llm_draft
+      sourceHandle: source
+      target: normalize
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: normalize-source-if_human-target
+      source: normalize
+      sourceHandle: source
+      target: if_human
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: if_human-true-answer_wait-target
+      source: if_human
+      sourceHandle: 'true'
+      target: answer_wait
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: if_human-false-answer_direct-target
+      source: if_human
+      sourceHandle: 'false'
+      target: answer_direct
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: human-input
+      id: answer_wait-source-human_input-target
+      source: answer_wait
+      sourceHandle: source
+      target: human_input
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: human-input
+        targetType: assigner
+      id: human_input-approve-assign_confirmed-target
+      source: human_input
+      sourceHandle: approve
+      target: assign_confirmed
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: human_input-reject-answer_rejected-target
+      source: human_input
+      sourceHandle: reject
+      target: answer_rejected
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: human-input
+        targetType: answer
+      id: human_input-__timeout-answer_timeout-target
+      source: human_input
+      sourceHandle: __timeout
+      target: answer_timeout
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: answer
+      id: assign_confirmed-source-answer_approved-target
+      source: assign_confirmed
+      sourceHandle: source
+      target: answer_approved
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables: []
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        classes:
+        - id: '1'
+          label: 経費
+          name: 経費精算、立替、領収書、交通費など、お金の払い戻しに関する問い合わせ
+        - id: '2'
+          label: 勤怠
+          name: 休暇申請、残業、打刻、勤務時間など、勤怠に関する問い合わせ
+        - id: '3'
+          label: IT
+          name: PC、アカウント、パスワード、社内システムの不具合など、IT に関する問い合わせ
+        - id: '4'
+          label: その他
+          name: 上記のいずれにも当てはまらない問い合わせ
+        desc: ''
+        instruction: 社内の問い合わせ窓口に届いた文章を、最も近い種別に分類してください。
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: Question Classifier
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 250
+      id: classifier
+      position:
+        x: 334
+        y: 300
+      positionAbsolute:
+        x: 334
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - classifier
+          - class_label
+          variable_selector:
+          - conversation
+          - category
+        selected: false
+        title: 'Variable Assigner: category'
+        type: assigner
+        version: '2'
+      height: 90
+      id: assign_cat
+      position:
+        x: 700
+        y: 300
+      positionAbsolute:
+        x: 700
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせへの回答案を日本語で 3 文以内で書きます。問い合わせの種別は「{{#conversation.category#}}」です。規程や手続きの詳細を断定できない場合、または種別が「その他」の場合は
+            needs_human を true にしてください。出力は指定された JSON Schema に従ってください。
+        - role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              answer:
+                description: 問い合わせへの回答案。日本語で 3 文以内
+                type: string
+              needs_human:
+                description: 担当者による確認が必要なら true
+                type: boolean
+            required:
+            - answer
+            - needs_human
+            type: object
+        structured_output_enabled: true
+        title: 'LLM: draft'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm_draft
+      position:
+        x: 1060
+        y: 300
+      positionAbsolute:
+        x: 1060
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(result: dict) -> dict:\n    needs_human = result.get(\"\
+          needs_human\", True)\n    if isinstance(needs_human, str):\n        needs_human\
+          \ = needs_human.strip().lower() in (\"true\", \"yes\", \"1\")\n    return\
+          \ {\"answer\": str(result.get(\"answer\", \"\")).strip(), \"needs_human\"\
+          : bool(needs_human)}\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          answer:
+            children: null
+            type: string
+          needs_human:
+            children: null
+            type: boolean
+        selected: false
+        title: 'Code: normalize'
+        type: code
+        variables:
+        - value_selector:
+          - llm_draft
+          - structured_output
+          variable: result
+      height: 90
+      id: normalize
+      position:
+        x: 1400
+        y: 300
+      positionAbsolute:
+        x: 1400
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: c1
+            value: true
+            varType: boolean
+            variable_selector:
+            - normalize
+            - needs_human
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 'IF/ELSE: needs_human'
+        type: if-else
+      height: 90
+      id: if_human
+      position:
+        x: 1740
+        y: 300
+      positionAbsolute:
+        x: 1740
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '担当者が回答案を確認しています。しばらくお待ちください。
+
+
+          '
+        desc: ''
+        selected: false
+        title: 'Answer: wait'
+        type: answer
+      height: 90
+      id: answer_wait
+      position:
+        x: 2080
+        y: 160
+      positionAbsolute:
+        x: 2080
+        y: 160
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        delivery_methods:
+        - config: {}
+          enabled: true
+          id: b8ad5ac5-353d-4b22-a07c-672bc034bce3
+          type: webapp
+        desc: ''
+        form_content: '## 回答案の確認
+
+
+          **問い合わせ**
+
+
+          {{#sys.query#}}
+
+
+          **回答案**
+
+
+          {{#normalize.answer#}}
+
+
+          補足があれば記入してください。
+
+
+          {{#$output.comment#}}'
+        inputs:
+        - default:
+            selector: []
+            type: constant
+            value: ''
+          output_variable_name: comment
+          type: paragraph
+        selected: false
+        timeout: 1
+        timeout_unit: day
+        title: Human Input
+        type: human-input
+        user_actions:
+        - button_style: primary
+          id: approve
+          title: 承認して返信
+        - button_style: default
+          id: reject
+          title: 担当者が折り返す
+      height: 160
+      id: human_input
+      position:
+        x: 2420
+        y: 160
+      positionAbsolute:
+        x: 2420
+        y: 160
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: constant
+          operation: set
+          value: true
+          variable_selector:
+          - conversation
+          - confirmed
+        selected: false
+        title: 'Variable Assigner: confirmed'
+        type: assigner
+        version: '2'
+      height: 90
+      id: assign_confirmed
+      position:
+        x: 2760
+        y: 60
+      positionAbsolute:
+        x: 2760
+        y: 60
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#normalize.answer#}}
+
+
+          (担当者確認済み){{#human_input.comment#}}'
+        desc: ''
+        selected: false
+        title: 'Answer: approved'
+        type: answer
+      height: 90
+      id: answer_approved
+      position:
+        x: 3100
+        y: 60
+      positionAbsolute:
+        x: 3100
+        y: 60
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: この件は担当者から折り返します。{{#human_input.comment#}}
+        desc: ''
+        selected: false
+        title: 'Answer: rejected'
+        type: answer
+      height: 90
+      id: answer_rejected
+      position:
+        x: 2760
+        y: 260
+      positionAbsolute:
+        x: 2760
+        y: 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: 確認が期限内に完了しませんでした。改めてお問い合わせください。
+        desc: ''
+        selected: false
+        title: 'Answer: timeout'
+        type: answer
+      height: 90
+      id: answer_timeout
+      position:
+        x: 2760
+        y: 460
+      positionAbsolute:
+        x: 2760
+        y: 460
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#normalize.answer#}}'
+        desc: ''
+        selected: false
+        title: 'Answer: direct'
+        type: answer
+      height: 90
+      id: answer_direct
+      position:
+        x: 2080
+        y: 660
+      positionAbsolute:
+        x: 2080
+        y: 660
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.5
+  rag_pipeline_variables: []
+

@@ -1,0 +1,15 @@
+identity:
+  author: "example"
+  name: "office_hours"
+  label:
+    en_US: "office_hours"
+    ja_JP: "拠点の受付時間"
+  description:
+    en_US: "Minimal tool plugin that returns office reception hours."
+    ja_JP: "拠点の受付時間を返す最小ツールプラグイン"
+  icon: "icon.svg"
+tools:
+  - tools/office_hours.yaml
+extra:
+  python:
+    source: provider/office_hours.py

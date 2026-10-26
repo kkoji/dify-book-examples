@@ -1,0 +1,44 @@
+# 評価ランナー(run_eval.py)のテストケース。
+# workflow 章の Workflow(support-triage)に question を渡し、outputs.category が expected.category と一致するかを見る。
+# expected.needs_human を書いた場合はそれも比較する(省略可)。
+# judge: true のケースは answer の妥当性を LLM-as-a-judge(judge.py)でも採点する。
+cases:
+  - id: expense-taxi
+    question: 先週の出張で立て替えたタクシー代はどうやって精算すればいいですか。領収書はあります。
+    expected:
+      category: 経費
+      needs_human: false
+    judge: true
+  - id: expense-per-diem
+    question: 出張の日当は申請できますか。
+    expected:
+      category: 経費
+    judge: true
+  - id: attendance-leave
+    question: 来月の有給休暇を 3 日まとめて取りたいのですが、申請の締め切りはいつですか。
+    expected:
+      category: 勤怠
+    judge: true
+  - id: attendance-overtime
+    question: 先月の残業時間が勤怠システムの表示と合いません。どこに連絡すればいいですか。
+    expected:
+      category: 勤怠
+  - id: it-wifi
+    question: 社内 Wi-Fi に接続できなくなりました。パスワードを変えた覚えはありません。
+    expected:
+      category: IT
+    judge: true
+  - id: it-laptop
+    question: ノート PC の電源が入らなくなりました。昨日までは使えていました。
+    expected:
+      category: IT
+  - id: other-plants
+    question: オフィスの観葉植物の水やり当番は誰が決めていますか。
+    expected:
+      category: その他
+      needs_human: true
+  - id: other-cafeteria
+    question: 社員食堂の来週のメニューはどこで見られますか。
+    expected:
+      category: その他
+      needs_human: true

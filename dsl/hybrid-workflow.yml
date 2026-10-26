@@ -1,0 +1,259 @@
+app:
+  description: 分類を外部の LangGraph サービス(HTTP Request)に任せ、回答生成と整形は Dify に残すハイブリッド構成
+  icon: 🔀
+  icon_background: '#E0F2FE'
+  icon_type: emoji
+  mode: workflow
+  name: 'limits-migration: hybrid-workflow'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: http-request
+      id: start-source-http_classify-target
+      source: start
+      sourceHandle: source
+      target: http_classify
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: http_classify-source-parse-target
+      source: http_classify
+      sourceHandle: source
+      target: parse
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: parse-source-llm_answer-target
+      source: parse
+      sourceHandle: source
+      target: llm_answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: end
+      id: llm_answer-source-end-target
+      source: llm_answer
+      sourceHandle: source
+      target: end
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - label: question
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: question
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 200
+      positionAbsolute:
+        x: 30
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data:
+          - key: ''
+            type: text
+            value: '{"question": "{{#start.question#}}"}'
+          type: json
+        desc: ''
+        headers: 'Content-Type: application/json'
+        method: post
+        params: ''
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 10
+          read: 120
+          write: 30
+        title: 'HTTP Request: classify'
+        type: http-request
+        url: http://host.docker.internal:8104/classify
+      height: 120
+      id: http_classify
+      position:
+        x: 334
+        y: 200
+      positionAbsolute:
+        x: 334
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "import json\n\ndef main(body: str, status_code: int) -> dict:\n   \
+          \ category = \"その他\"\n    if status_code == 200:\n        try:\n       \
+          \     category = str(json.loads(body).get(\"category\") or category)\n \
+          \       except Exception:\n            pass\n    return {\"category\": category}\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          category:
+            children: null
+            type: string
+        selected: false
+        title: 'Code: parse'
+        type: code
+        variables:
+        - value_selector:
+          - http_classify
+          - body
+          variable: body
+        - value_selector:
+          - http_classify
+          - status_code
+          variable: status_code
+      height: 90
+      id: parse
+      position:
+        x: 638
+        y: 200
+      positionAbsolute:
+        x: 638
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせの種別は「{{#parse.category#}}」です。種別に合わせて、回答案を日本語で
+            3 文以内で書いてください。規程や手続きの詳細を断定できない場合は、担当者が確認する旨を添えてください。
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}'
+        selected: false
+        title: 'LLM: answer'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm_answer
+      position:
+        x: 942
+        y: 200
+      positionAbsolute:
+        x: 942
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - parse
+          - category
+          value_type: string
+          variable: category
+        - value_selector:
+          - llm_answer
+          - text
+          value_type: string
+          variable: answer
+        - value_selector:
+          - http_classify
+          - status_code
+          value_type: number
+          variable: classifier_status
+        selected: false
+        title: Output
+        type: end
+      height: 90
+      id: end
+      position:
+        x: 1246
+        y: 200
+      positionAbsolute:
+        x: 1246
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.8
+  rag_pipeline_variables: []

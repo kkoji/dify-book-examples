@@ -1,0 +1,19 @@
+# OpenTelemetry Collector をローカルで動かし、Dify の api / worker から OTLP でトレースとメトリクスを受ける最小構成。
+# 受けたデータは debug exporter でコレクタのログに出すだけ(本番では Tempo / Jaeger / Prometheus などの exporter に差し替える)。
+#
+# 使い方:
+#   docker compose up -d
+#   docker compose logs -f otel-collector     # Dify から届いたスパンとメトリクスが流れる
+#   curl -s http://localhost:13133            # ヘルスチェック
+# Dify 側の設定は dify-otel.env.example を参照。
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.161.0
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - 4317:4317     # OTLP gRPC
+      - 4318:4318     # OTLP HTTP
+      - 127.0.0.1:13133:13133   # health_check 拡張

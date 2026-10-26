@@ -1,0 +1,189 @@
+app:
+  description: Agent ノードが社内 API(カスタムツール)を呼んで問い合わせに答える
+  icon: 🔧
+  icon_background: '#E0F2FE'
+  icon_type: emoji
+  mode: workflow
+  name: 'tools-mcp: agent-with-custom-tool'
+  use_icon_as_answer_icon: false
+dependencies: []
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: agent
+      id: start-source-agent-target
+      source: start
+      sourceHandle: source
+      target: agent
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: agent
+        targetType: end
+      id: agent-source-end-target
+      source: agent
+      sourceHandle: source
+      target: end
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - label: question
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: question
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 200
+      positionAbsolute:
+        x: 30
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        agent_parameters:
+          instruction:
+            type: constant
+            value: あなたは社内ヘルプデスクの担当者です。社員情報の照会や IT 機器の申請が必要なときはツールを使ってください。社員 ID が本文に書かれていればそれを使い、結果を日本語で簡潔に報告してください。
+          maximum_iterations:
+            type: constant
+            value: 5
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0.1
+              mode: chat
+              model: qwen2.5:7b
+              model_type: llm
+              provider: langgenius/ollama/ollama
+          query:
+            type: constant
+            value: '{{#start.question#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: 社員 ID から氏名、所属部署、上長の社員 ID を返す。
+              parameters:
+                employee_id:
+                  auto: 1
+                  value: null
+              provider_name: 3dcaeafc-d4f7-4ae4-abd1-9b4334da9742
+              provider_show_name: internal_hr_it_api
+              settings: {}
+              tool_description: 社員 ID から氏名、所属部署、上長の社員 ID を返す。
+              tool_label: get_employee
+              tool_name: get_employee
+              type: api
+            - enabled: true
+              extra:
+                description: 社員 ID、機器名、理由を受け取り、IT 機器の申請を受理して申請 ID を返す。
+              parameters:
+                device:
+                  auto: 1
+                  value: null
+                employee_id:
+                  auto: 1
+                  value: null
+                reason:
+                  auto: 1
+                  value: null
+              provider_name: 3dcaeafc-d4f7-4ae4-abd1-9b4334da9742
+              provider_show_name: internal_hr_it_api
+              settings: {}
+              tool_description: 社員 ID、機器名、理由を受け取り、IT 機器の申請を受理して申請 ID を返す。
+              tool_label: create_it_request
+              tool_name: create_it_request
+              type: api
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: ''
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.50@bf1040682cc9e1e5caf9b4670531639c440bf9448025cd5ee0915fdcf7a921f3
+        selected: false
+        title: Agent
+        tool_node_version: '2'
+        type: agent
+      height: 90
+      id: agent
+      position:
+        x: 334
+        y: 200
+      positionAbsolute:
+        x: 334
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - agent
+          - text
+          value_type: string
+          variable: answer
+        selected: false
+        title: Output
+        type: end
+      height: 90
+      id: end
+      position:
+        x: 700
+        y: 200
+      positionAbsolute:
+        x: 700
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.8
+  rag_pipeline_variables: []

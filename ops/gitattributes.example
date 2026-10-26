@@ -1,0 +1,17 @@
+# Dify DSL を Git で管理するときの diff 設定例(著者の整理。Dify 公式のガイドではない)
+#
+# リポジトリ直下の .gitattributes に次の 1 行を足すと、dsl/ 配下の YAML は
+# "dify-dsl" という diff ドライバで比較される。
+#
+#   dsl/*.yml diff=dify-dsl
+#
+# ドライバの実体は各自の git config で登録する(.gitattributes だけでは有効にならない)。
+#
+#   git config diff.dify-dsl.textconv "python3 ops/dsl_diff_filter.py"
+#
+# これで `git diff` / `git log -p` の表示からノード座標などのレイアウト差分が消え、
+# `graph.nodes[].data`(ノードの設定)や `environment_variables` の変更だけが見える。
+# textconv は表示にしか効かないので、コミットされる YAML はエクスポートしたままで変わらない。
+# `git diff --no-textconv` で生の差分に戻せる。
+
+dsl/*.yml diff=dify-dsl

@@ -1,0 +1,137 @@
+agent:
+  package_ref: agent_1
+agent_packages:
+  agent_1:
+    metadata:
+      description: 社内の IT 機器申請の下書きを作る
+      icon: null
+      icon_background: null
+      icon_type: null
+      name: 'new-agent: it-request-drafter'
+      role: IT 機器申請の下書きワーカー
+    omitted_assets: []
+    schema_version: 1
+    soul:
+      app_features:
+        file_upload:
+          allowed_file_extensions:
+          - JPG
+          - JPEG
+          - PNG
+          - GIF
+          - WEBP
+          - SVG
+          allowed_file_types:
+          - document
+          - image
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          enabled: true
+          image:
+            enabled: true
+          number_limits: 3
+        opening_statement: null
+        retriever_resource: null
+        sensitive_word_avoidance: null
+        speech_to_text: null
+        suggested_questions: null
+        suggested_questions_after_answer: null
+        text_to_speech: null
+      app_variables: []
+      config_files: []
+      config_note: ''
+      config_skills: []
+      env:
+        secret_refs: []
+        variables: []
+      human:
+        contacts: []
+        tools: []
+      knowledge:
+        sets: []
+      memory:
+        artifacts: []
+        budget: null
+        scope: null
+      misc_legacy:
+        file_upload:
+          allowed_file_extensions:
+          - JPG
+          - JPEG
+          - PNG
+          - GIF
+          - WEBP
+          - SVG
+          allowed_file_types:
+          - document
+          - image
+          - audio
+          - video
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          enabled: true
+          image:
+            enabled: true
+          number_limits: 3
+        opening_statement: null
+        retriever_resource: null
+        sensitive_word_avoidance: null
+        speech_to_text: null
+        suggested_questions: null
+        suggested_questions_after_answer: null
+        text_to_speech: null
+      model:
+        credential_ref: null
+        model: qwen2.5:7b
+        model_provider: langgenius/ollama/ollama
+        model_settings:
+          frequency_penalty: null
+          max_tokens: null
+          presence_penalty: null
+          response_format: null
+          stop: null
+          temperature: 0.2
+          top_p: null
+        plugin_id: langgenius/ollama
+      prompt:
+        system_prompt: 'あなたは社内ヘルプデスクの IT 機器申請を手伝うワーカーです。
+
+          利用者から機器の種類、用途、希望納期を聞き取り、次の見出しを持つ申請書の下書きを Markdown で作ります。
+
+          ## 申請者 / ## 希望機器 / ## 用途 / ## 希望納期 / ## 備考
+
+          情報が足りないときは推測せず、不足している項目を質問してください。
+
+          下書きが完成したら、サンドボックス内で it_request_draft.md というファイルに保存し、保存したパスも報告してください。'
+      sandbox:
+        config:
+          cpu: null
+          env: []
+          image: null
+          working_dir: null
+        provider: null
+      schema_version: 1
+      tools:
+        cli_tools: []
+        dify_tools: []
+    workspace_skills: []
+app:
+  description: 社内の IT 機器申請の下書きを作る
+  icon: null
+  icon_background: null
+  icon_type: emoji
+  mode: agent
+  name: 'new-agent: it-request-drafter'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0

@@ -1,0 +1,69 @@
+# MinIO(S3 互換)をローカルに足して STORAGE_TYPE=s3 の構成を模す override
+#
+# 使い方(docker/ ディレクトリで):
+#   docker compose -f docker-compose.yaml -f docker-compose.override.example.yaml config   # 構文確認
+#   docker compose -f docker-compose.yaml -f docker-compose.override.example.yaml up -d
+#
+# 対象: Dify 1.17.1 の docker/docker-compose.yaml
+# 注意:
+#   - docker-compose.yaml には milvus 用の `minio` サービス(container_name: milvus-minio)が
+#     すでにある。名前が衝突しないよう、ここでは `dify_minio` という別名にしている
+#   - MinIO はパス形式のアドレスが必要なので S3_ADDRESS_STYLE=path にする
+#   - バケットは api 起動時に head_bucket → 無ければ create_bucket で作られる
+#   - 既存の ./volumes/app/storage にあるファイルは自動では移らない。
+#     1.17.1 の api には `flask migrate-oss`(--dry-run あり)が同梱されており、
+#     privkeys / upload_files / image_files などを現在の STORAGE_TYPE へ移せる
+#   - 本番では MinIO ではなく S3 / 互換サービスの実体を指す
+
+x-s3-env: &s3-env
+  STORAGE_TYPE: s3
+  S3_ENDPOINT: http://dify_minio:9000
+  S3_REGION: us-east-1
+  S3_BUCKET_NAME: dify
+  S3_ACCESS_KEY: ${MINIO_ROOT_USER:-minioadmin}
+  S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-minioadmin}
+  S3_ADDRESS_STYLE: path
+  S3_USE_AWS_MANAGED_IAM: "false"
+
+services:
+  dify_minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - ./volumes/dify_minio:/data
+    ports:
+      # 管理コンソール。ローカル確認用で、本番では公開しない
+      - "127.0.0.1:9001:9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - default
+
+  api:
+    environment:
+      <<: *s3-env
+    depends_on:
+      dify_minio:
+        condition: service_healthy
+
+  worker:
+    environment:
+      <<: *s3-env
+    depends_on:
+      dify_minio:
+        condition: service_healthy
+
+  worker_beat:
+    environment:
+      <<: *s3-env
+
+  api_websocket:
+    environment:
+      <<: *s3-env

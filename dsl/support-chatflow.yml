@@ -1,0 +1,475 @@
+app:
+  description: 問い合わせを分類し、会話変数と Memory で多ターンの状態を持つ Chatflow
+  icon: 💬
+  icon_background: '#E4FBCC'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 'chatflow: support-chatflow'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables:
+  - description: 直近の問い合わせ種別
+    id: 3df3830f-e82e-47ee-a801-509820f9f1d6
+    name: category
+    selector:
+    - conversation
+    - category
+    value: ''
+    value_type: string
+  - description: ユーザーが名乗った部署
+    id: d97f5278-9d70-4bc4-818d-7cebdfb296cf
+    name: department
+    selector:
+    - conversation
+    - department
+    value: ''
+    value_type: string
+  - description: この会話での質問回数
+    id: 7b3789bc-ed51-4784-b73c-91c835e5d764
+    name: turn_count
+    selector:
+    - conversation
+    - turn_count
+    value: 0
+    value_type: integer
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: question-classifier
+      id: start-source-classifier-target
+      source: start
+      sourceHandle: source
+      target: classifier
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: classifier-1-extract-target
+      source: classifier
+      sourceHandle: '1'
+      target: extract
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: classifier-2-extract-target
+      source: classifier
+      sourceHandle: '2'
+      target: extract
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: classifier-3-extract-target
+      source: classifier
+      sourceHandle: '3'
+      target: extract
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: classifier-4-extract-target
+      source: classifier
+      sourceHandle: '4'
+      target: extract
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: if-else
+      id: extract-source-if_dept-target
+      source: extract
+      sourceHandle: source
+      target: if_dept
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: if_dept-true-assign_dept-target
+      source: if_dept
+      sourceHandle: 'true'
+      target: assign_dept
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: assigner
+      id: if_dept-false-assign_state-target
+      source: if_dept
+      sourceHandle: 'false'
+      target: assign_state
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: assigner
+      id: assign_dept-source-assign_state-target
+      source: assign_dept
+      sourceHandle: source
+      target: assign_state
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: answer
+      id: assign_state-source-answer_ack-target
+      source: assign_state
+      sourceHandle: source
+      target: answer_ack
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: answer
+        targetType: llm
+      id: answer_ack-source-llm-target
+      source: answer_ack
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: llm-source-answer_main-target
+      source: llm
+      sourceHandle: source
+      target: answer_main
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables: []
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        classes:
+        - id: '1'
+          label: 経費
+          name: 経費精算、立替、領収書、交通費など、お金の払い戻しに関する問い合わせ
+        - id: '2'
+          label: 勤怠
+          name: 休暇申請、残業、打刻、勤務時間など、勤怠に関する問い合わせ
+        - id: '3'
+          label: IT
+          name: PC、アカウント、パスワード、社内システムの不具合など、IT に関する問い合わせ
+        - id: '4'
+          label: その他
+          name: 上記のいずれにも当てはまらない問い合わせ
+        desc: ''
+        instruction: 社内の問い合わせ窓口に届いた文章を、最も近い種別に分類してください。
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: Question Classifier
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 250
+      id: classifier
+      position:
+        x: 334
+        y: 300
+      positionAbsolute:
+        x: 334
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        instruction: ユーザーが自分の所属部署を名乗っていれば、その部署名だけを抜き出してください。名乗っていなければ空文字にしてください。
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 'ユーザーが名乗った所属部署(例: 経理部)。本文に無ければ空文字'
+          name: department
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: function_call
+        selected: false
+        title: Parameter Extractor
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 90
+      id: extract
+      position:
+        x: 700
+        y: 300
+      positionAbsolute:
+        x: 700
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: c1
+            value: ''
+            varType: string
+            variable_selector:
+            - extract
+            - department
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 90
+      id: if_dept
+      position:
+        x: 1060
+        y: 300
+      positionAbsolute:
+        x: 1060
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - extract
+          - department
+          variable_selector:
+          - conversation
+          - department
+        selected: false
+        title: 'Variable Assigner: department'
+        type: assigner
+        version: '2'
+      height: 90
+      id: assign_dept
+      position:
+        x: 1400
+        y: 160
+      positionAbsolute:
+        x: 1400
+        y: 160
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - classifier
+          - class_label
+          variable_selector:
+          - conversation
+          - category
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        selected: false
+        title: 'Variable Assigner: state'
+        type: assigner
+        version: '2'
+      height: 90
+      id: assign_state
+      position:
+        x: 1740
+        y: 300
+      positionAbsolute:
+        x: 1740
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '【種別: {{#conversation.category#}} / 部署: {{#conversation.department#}}
+          / {{#conversation.turn_count#}} 回目の質問】
+
+
+          '
+        desc: ''
+        selected: false
+        title: 'Answer: ack'
+        type: answer
+      height: 90
+      id: answer_ack
+      position:
+        x: 2080
+        y: 300
+      positionAbsolute:
+        x: 2080
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせに日本語で 3 文以内で答えてください。問い合わせの種別は「{{#conversation.category#}}」、質問者の部署は「{{#conversation.department#}}」です。部署が分かっている場合は、その部署向けの一言を添えてください。
+        - role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm
+      position:
+        x: 2420
+        y: 300
+      positionAbsolute:
+        x: 2420
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#llm.text#}}'
+        desc: ''
+        selected: false
+        title: 'Answer: main'
+        type: answer
+      height: 90
+      id: answer_main
+      position:
+        x: 2760
+        y: 300
+      positionAbsolute:
+        x: 2760
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.5
+  rag_pipeline_variables: []
+

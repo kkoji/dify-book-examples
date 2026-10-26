@@ -1,0 +1,60 @@
+app:
+  description: 'app-types 章のサンプル。Chatbot(mode: chat)の最小構成'
+  icon: 💬
+  icon_background: '#E4FBCC'
+  icon_type: emoji
+  mode: chat
+  name: 'app-types: chatbot-minimal'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+model_config:
+  agent_mode:
+    enabled: false
+    strategy: router
+    tools: []
+  annotation_reply:
+    enabled: false
+  chat_prompt_config: {}
+  completion_prompt_config: {}
+  dataset_configs:
+    datasets:
+      datasets: []
+    retrieval_model: multiple
+  dataset_query_variable: null
+  external_data_tools: []
+  file_upload:
+    enabled: false
+  model:
+    completion_params:
+      stop: []
+      temperature: 0.3
+    mode: chat
+    name: qwen2.5:7b
+    provider: langgenius/ollama/ollama
+  more_like_this:
+    enabled: false
+  opening_statement: 社内の手続きについて質問してください。
+  pre_prompt: あなたは社内問い合わせ窓口のアシスタントです。質問には日本語で、3 文以内で答えてください。
+  prompt_type: simple
+  retriever_resource:
+    enabled: false
+  sensitive_word_avoidance:
+    enabled: false
+  speech_to_text:
+    enabled: false
+  suggested_questions: []
+  suggested_questions_after_answer:
+    enabled: false
+  text_to_speech:
+    enabled: false
+    language: ''
+    voice: ''
+  user_input_form: []
+version: 0.7.0
+

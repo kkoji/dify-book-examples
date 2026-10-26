@@ -1,0 +1,468 @@
+app:
+  description: 回答案を自己採点させ、基準点に達するまで最大 3 回書き直す Loop の例
+  icon: 🔂
+  icon_background: '#FFF4ED'
+  icon_type: emoji
+  mode: workflow
+  name: 'workflow-control-flow: loop-refine'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: loop
+      id: start-source-loop-target
+      source: start
+      sourceHandle: source
+      target: loop
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        sourceType: loop-start
+        targetType: llm
+      id: loop_start-source-writer-target
+      source: loop_start
+      sourceHandle: source
+      target: writer
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        sourceType: llm
+        targetType: llm
+      id: writer-source-judge-target
+      source: writer
+      sourceHandle: source
+      target: judge
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        sourceType: llm
+        targetType: code
+      id: judge-source-parse-target
+      source: judge
+      sourceHandle: source
+      target: parse
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        sourceType: code
+        targetType: assigner
+      id: parse-source-assign-target
+      source: parse
+      sourceHandle: source
+      target: assign
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: loop
+        targetType: end
+      id: loop-source-end-target
+      source: loop
+      sourceHandle: source
+      target: end
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - label: question
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: question
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        break_conditions:
+        - comparison_operator: ≥
+          id: cond_score
+          value: '8'
+          varType: number
+          variable_selector:
+          - loop
+          - score
+        desc: ''
+        height: 260
+        logical_operator: and
+        loop_count: 3
+        loop_variables:
+        - id: lv_draft
+          label: draft
+          value: ''
+          value_type: constant
+          var_type: string
+        - id: lv_feedback
+          label: feedback
+          value: ''
+          value_type: constant
+          var_type: string
+        - id: lv_score
+          label: score
+          value: 0
+          value_type: constant
+          var_type: number
+        - id: lv_attempt
+          label: attempt
+          value: 0
+          value_type: constant
+          var_type: number
+        selected: false
+        start_node_id: loop_start
+        title: 'Loop: refine'
+        type: loop
+        width: 1340
+      height: 260
+      id: loop
+      position:
+        x: 334
+        y: 200
+      positionAbsolute:
+        x: 334
+        y: 200
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 1340
+      zIndex: 1
+    - data:
+        desc: ''
+        isInLoop: true
+        selected: false
+        title: ''
+        type: loop-start
+      draggable: false
+      height: 48
+      id: loop_start
+      parentId: loop
+      position:
+        x: 60
+        y: 100
+      positionAbsolute:
+        x: 394
+        y: 300
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-loop-start
+      width: 44
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせへの回答案を日本語で書きます。回答は 3 文以内にし、次に取るべき行動を 1 つ必ず含めてください。回答案だけを出力し、前置きや見出しは付けません。
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}
+
+
+            前回の回答案(空なら初回):
+
+            {{#loop.draft#}}
+
+
+            前回の回答案への指摘(空なら初回):
+
+            {{#loop.feedback#}}
+
+
+            指摘がある場合はそれを反映して書き直してください。'
+        selected: false
+        title: 'LLM: writer'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: writer
+      parentId: loop
+      position:
+        x: 160
+        y: 100
+      positionAbsolute:
+        x: 494
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: 'あなたはヘルプデスク回答のレビュー担当です。回答案を 0〜10 点で採点します。基準: 問い合わせに直接答えている(4 点)、次に取るべき行動が具体的(3
+            点)、3 文以内で簡潔(3 点)。出力は指定された JSON Schema に従ってください。'
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}
+
+
+            回答案:
+
+            {{#writer.text#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              feedback:
+                description: 減点した理由と、次に直すべき点。日本語で 2 文以内
+                type: string
+              score:
+                description: 回答案の点数。0〜10 の整数
+                type: integer
+            required:
+            - score
+            - feedback
+            type: object
+        structured_output_enabled: true
+        title: 'LLM: judge'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: judge
+      parentId: loop
+      position:
+        x: 460
+        y: 100
+      positionAbsolute:
+        x: 794
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        code: "\ndef main(result: dict, text: str) -> dict:\n    # 構造化出力が揺れたときに備えて\
+          \ score を数値に、feedback を文字列にそろえる\n    score = result.get(\"score\") if isinstance(result,\
+          \ dict) else None\n    try:\n        score = int(float(str(score)))\n  \
+          \  except (TypeError, ValueError):\n        score = 0\n    feedback = result.get(\"\
+          feedback\", \"\") if isinstance(result, dict) else \"\"\n    return {\"\
+          score\": max(0, min(10, score)), \"feedback\": str(feedback or text).strip()}\n"
+        code_language: python3
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        loop_id: loop
+        outputs:
+          feedback:
+            children: null
+            type: string
+          score:
+            children: null
+            type: number
+        selected: false
+        title: 'Code: parse score'
+        type: code
+        variables:
+        - value_selector:
+          - judge
+          - structured_output
+          variable: result
+        - value_selector:
+          - judge
+          - text
+          variable: text
+      height: 90
+      id: parse
+      parentId: loop
+      position:
+        x: 760
+        y: 100
+      positionAbsolute:
+        x: 1094
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: false
+        isInLoop: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - writer
+          - text
+          variable_selector:
+          - loop
+          - draft
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - parse
+          - feedback
+          variable_selector:
+          - loop
+          - feedback
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - parse
+          - score
+          variable_selector:
+          - loop
+          - score
+          write_mode: over-write
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - loop
+          - attempt
+          write_mode: over-write
+        loop_id: loop
+        selected: false
+        title: Variable Assigner
+        type: assigner
+        version: '2'
+      height: 90
+      id: assign
+      parentId: loop
+      position:
+        x: 1060
+        y: 100
+      positionAbsolute:
+        x: 1394
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - loop
+          - draft
+          value_type: string
+          variable: answer
+        - value_selector:
+          - loop
+          - score
+          value_type: number
+          variable: score
+        - value_selector:
+          - loop
+          - attempt
+          value_type: number
+          variable: attempts
+        selected: false
+        title: Output
+        type: end
+      height: 90
+      id: end
+      position:
+        x: 1740
+        y: 300
+      positionAbsolute:
+        x: 1740
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.6
+  rag_pipeline_variables: []

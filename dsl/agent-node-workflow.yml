@@ -1,0 +1,625 @@
+app:
+  description: agent 章のサンプル。support-triage の IT 分岐を Agent ノード(FunctionCalling 戦略、Current
+    Time ツール)に置き換えた Workflow
+  icon: 🛠️
+  icon_background: '#FFEAD5'
+  icon_type: emoji
+  mode: workflow
+  name: 'agent: support-triage-agent-node'
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.2@ef203a332d1b2b8952dbaa012be70be3e0a2d576b001489fb3b070efc970ffbe
+    version: null
+kind: app
+version: 0.7.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: question-classifier
+      id: start-source-classifier-target
+      source: start
+      sourceHandle: source
+      target: classifier
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: llm
+      id: classifier-1-llm_expense-target
+      source: classifier
+      sourceHandle: '1'
+      target: llm_expense
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: llm
+      id: classifier-2-llm_attendance-target
+      source: classifier
+      sourceHandle: '2'
+      target: llm_attendance
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: llm
+      id: classifier-4-llm_other-target
+      source: classifier
+      sourceHandle: '4'
+      target: llm_other
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: llm_expense-source-aggregator-target
+      source: llm_expense
+      sourceHandle: source
+      target: aggregator
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: llm_attendance-source-aggregator-target
+      source: llm_attendance
+      sourceHandle: source
+      target: aggregator
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: variable-aggregator
+      id: llm_other-source-aggregator-target
+      source: llm_other
+      sourceHandle: source
+      target: aggregator
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: variable-aggregator
+        targetType: code
+      id: aggregator-source-normalize-target
+      source: aggregator
+      sourceHandle: source
+      target: normalize
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: end
+      id: normalize-source-end-target
+      source: normalize
+      sourceHandle: source
+      target: end
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: agent
+      id: classifier-3-agent_it-target
+      source: classifier
+      sourceHandle: '3'
+      target: agent_it
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: agent
+        targetType: code
+      id: agent_it-source-wrap_it-target
+      source: agent_it
+      sourceHandle: source
+      target: wrap_it
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: variable-aggregator
+      id: wrap_it-source-aggregator-target
+      source: wrap_it
+      sourceHandle: source
+      target: aggregator
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: User Input
+        type: start
+        variables:
+        - label: question
+          max_length: 2000
+          options: []
+          required: true
+          type: paragraph
+          variable: question
+      height: 90
+      id: start
+      position:
+        x: 30
+        y: 300
+      positionAbsolute:
+        x: 30
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        classes:
+        - id: '1'
+          label: 経費
+          name: 経費精算、立替、領収書、交通費など、お金の払い戻しに関する問い合わせ
+        - id: '2'
+          label: 勤怠
+          name: 休暇申請、残業、打刻、勤務時間など、勤怠に関する問い合わせ
+        - id: '3'
+          label: IT
+          name: PC、アカウント、パスワード、社内システムの不具合など、IT に関する問い合わせ
+        - id: '4'
+          label: その他
+          name: 上記のいずれにも当てはまらない問い合わせ
+        desc: ''
+        instruction: 社内の問い合わせ窓口に届いた文章を、最も近い種別に分類してください。
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        query_variable_selector:
+        - start
+        - question
+        selected: false
+        title: Question Classifier
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 250
+      id: classifier
+      position:
+        x: 334
+        y: 300
+      positionAbsolute:
+        x: 334
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせに対して回答案を日本語で 3 文以内で書きます。規程や手続きの詳細を断定できない場合は
+            needs_human を true にしてください。出力は指定された JSON Schema に従ってください。 この問い合わせは経費に関するものです。category
+            には「経費」を入れてください。申請システムへの入力と領収書の提出を案内してください。
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              answer:
+                description: 問い合わせへの回答案。日本語で 3 文以内
+                type: string
+              category:
+                description: 問い合わせの種別。経費 / 勤怠 / IT / その他 のいずれか
+                type: string
+              needs_human:
+                description: 担当者による確認が必要なら true
+                type: boolean
+            required:
+            - category
+            - answer
+            - needs_human
+            type: object
+        structured_output_enabled: true
+        title: 'LLM: 経費'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm_expense
+      position:
+        x: 700
+        y: 40
+      positionAbsolute:
+        x: 700
+        y: 40
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせに対して回答案を日本語で 3 文以内で書きます。規程や手続きの詳細を断定できない場合は
+            needs_human を true にしてください。出力は指定された JSON Schema に従ってください。 この問い合わせは勤怠に関するものです。category
+            には「勤怠」を入れてください。勤怠システムでの申請と上長承認の流れを案内してください。
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              answer:
+                description: 問い合わせへの回答案。日本語で 3 文以内
+                type: string
+              category:
+                description: 問い合わせの種別。経費 / 勤怠 / IT / その他 のいずれか
+                type: string
+              needs_human:
+                description: 担当者による確認が必要なら true
+                type: boolean
+            required:
+            - category
+            - answer
+            - needs_human
+            type: object
+        structured_output_enabled: true
+        title: 'LLM: 勤怠'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm_attendance
+      position:
+        x: 700
+        y: 260
+      positionAbsolute:
+        x: 700
+        y: 260
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - role: system
+          text: あなたは社内ヘルプデスクの担当者です。問い合わせに対して回答案を日本語で 3 文以内で書きます。規程や手続きの詳細を断定できない場合は
+            needs_human を true にしてください。出力は指定された JSON Schema に従ってください。 この問い合わせは経費・勤怠・IT
+            のどれにも当てはまりません。category には「その他」を入れ、needs_human は必ず true にしてください。担当部署を確認して折り返す旨を案内してください。
+        - role: user
+          text: '問い合わせ:
+
+            {{#start.question#}}'
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              answer:
+                description: 問い合わせへの回答案。日本語で 3 文以内
+                type: string
+              category:
+                description: 問い合わせの種別。経費 / 勤怠 / IT / その他 のいずれか
+                type: string
+              needs_human:
+                description: 担当者による確認が必要なら true
+                type: boolean
+            required:
+            - category
+            - answer
+            - needs_human
+            type: object
+        structured_output_enabled: true
+        title: 'LLM: その他'
+        type: llm
+        vision:
+          enabled: false
+      height: 90
+      id: llm_other
+      position:
+        x: 700
+        y: 700
+      positionAbsolute:
+        x: 700
+        y: 700
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        output_type: object
+        selected: false
+        title: Variable Aggregator
+        type: variable-aggregator
+        variables:
+        - - llm_expense
+          - structured_output
+        - - llm_attendance
+          - structured_output
+        - - wrap_it
+          - result
+        - - llm_other
+          - structured_output
+      height: 180
+      id: aggregator
+      position:
+        x: 1400
+        y: 300
+      positionAbsolute:
+        x: 1400
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(result: dict, class_label: str) -> dict:\n    # 構造化出力が揺れたときに備えて、キーと型をそろえる\n\
+          \    needs_human = result.get(\"needs_human\", True)\n    if isinstance(needs_human,\
+          \ str):\n        needs_human = needs_human.strip().lower() in (\"true\"\
+          , \"yes\", \"1\")\n    return {\n        \"category\": str(result.get(\"\
+          category\") or class_label),\n        \"answer\": str(result.get(\"answer\"\
+          , \"\")).strip(),\n        \"needs_human\": bool(needs_human),\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          answer:
+            children: null
+            type: string
+          category:
+            children: null
+            type: string
+          needs_human:
+            children: null
+            type: boolean
+        selected: false
+        title: 'Code: normalize'
+        type: code
+        variables:
+        - value_selector:
+          - aggregator
+          - output
+          variable: result
+        - value_selector:
+          - classifier
+          - class_label
+          variable: class_label
+      height: 90
+      id: normalize
+      position:
+        x: 1740
+        y: 300
+      positionAbsolute:
+        x: 1740
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        outputs:
+        - value_selector:
+          - normalize
+          - category
+          value_type: string
+          variable: category
+        - value_selector:
+          - normalize
+          - answer
+          value_type: string
+          variable: answer
+        - value_selector:
+          - normalize
+          - needs_human
+          value_type: boolean
+          variable: needs_human
+        selected: false
+        title: Output
+        type: end
+      height: 120
+      id: end
+      position:
+        x: 2080
+        y: 300
+      positionAbsolute:
+        x: 2080
+        y: 300
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        agent_parameters:
+          instruction:
+            type: mixed
+            value: 'あなたは社内ヘルプデスクの IT 担当者です。問い合わせに日本語で 3 文以内で答えてください。
+
+              ヘルプデスクの電話受付は平日(月〜金)の 9:00〜18:00 です。
+
+              日付や時刻、曜日に関わる判断(受付時間内かどうか、締め切り)が必要なときは、推測せずに必ず Current Time ツールで現在時刻を確認してから答えてください。
+
+              問い合わせの分類結果は「{{#classifier.class_label#}}」です。'
+          maximum_iterations:
+            type: constant
+            value: 3
+          model:
+            type: constant
+            value:
+              completion_params:
+                temperature: 0.1
+              mode: chat
+              model: qwen2.5:7b
+              model_type: llm
+              provider: langgenius/ollama/ollama
+          query:
+            type: mixed
+            value: '{{#start.question#}}'
+          tools:
+            type: constant
+            value:
+            - enabled: true
+              extra:
+                description: ''
+              parameters: {}
+              provider_name: time
+              settings:
+                format:
+                  value:
+                    type: constant
+                    value: '%Y-%m-%d %H:%M:%S (%A)'
+                timezone:
+                  value:
+                    type: constant
+                    value: Asia/Tokyo
+              tool_label: Current Time
+              tool_name: current_time
+              type: builtin
+        agent_strategy_label: FunctionCalling
+        agent_strategy_name: function_calling
+        agent_strategy_provider_name: langgenius/agent/agent
+        desc: IT の問い合わせはツールを使って回答する
+        memory:
+          window:
+            enabled: false
+            size: 10
+        output_schema: {}
+        plugin_unique_identifier: langgenius/agent:0.0.50@bf1040682cc9e1e5caf9b4670531639c440bf9448025cd5ee0915fdcf7a921f3
+        selected: false
+        title: 'Agent: IT'
+        tool_node_version: '2'
+        type: agent
+      height: 120
+      id: agent_it
+      position:
+        x: 700
+        y: 480
+      positionAbsolute:
+        x: 700
+        y: 480
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        code: "\ndef main(text: str) -> dict:\n    # Agent ノードの出力は text(最終回答)なので、他の分岐の\
+          \ structured_output と同じ形にそろえる\n    return {\n        \"result\": {\n   \
+          \         \"category\": \"IT\",\n            \"answer\": (text or \"\").strip(),\n\
+          \            \"needs_human\": not bool(text),\n        }\n    }\n"
+        code_language: python3
+        desc: Agent ノードの text を他分岐と同じ形に揃える
+        outputs:
+          result:
+            children: null
+            type: object
+        selected: false
+        title: 'Code: wrap IT'
+        type: code
+        variables:
+        - value_selector:
+          - agent_it
+          - text
+          variable: text
+      height: 90
+      id: wrap_it
+      position:
+        x: 1060
+        y: 480
+      positionAbsolute:
+        x: 1060
+        y: 480
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+  rag_pipeline_variables: []
