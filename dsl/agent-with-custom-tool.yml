@@ -92,9 +92,10 @@ workflow:
             type: constant
             value:
               completion_params:
+                think: false
                 temperature: 0.1
               mode: chat
-              model: qwen2.5:7b
+              model: qwen3:8b
               model_type: llm
               provider: langgenius/ollama/ollama
           query:

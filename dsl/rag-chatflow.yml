@@ -154,9 +154,10 @@ workflow:
         desc: ''
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         prompt_template:
         - role: system

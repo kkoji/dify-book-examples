@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Dify | 1.17.1(セルフホスト、Docker Compose、`docker/.env.example` をそのまま `.env` にした構成) | 2026-10-03 |
 | Docker / Compose | 29.8.1 / v5.5.1(macOS) | 2026-10-03 |
-| LLM | Ollama `qwen2.5:7b`(Dify プラグイン `langgenius/ollama` 1.0.2、Base URL `http://host.docker.internal:11434`) | 2026-10-03 |
+| LLM | Ollama `qwen3:8b`(Dify プラグイン `langgenius/ollama` 1.0.2、Base URL `http://host.docker.internal:11434`) | 2026-10-03 |
 | 埋め込み | Ollama `nomic-embed-text` | 2026-10-03 |
 | Python(API を呼ぶスクリプト `python/`) | 3.10.16、依存は `python/requirements.txt` で固定 | 2026-10-03 |
 | Python(サーバー系 `tools/*`、`python/hybrid`) | 3.12.10、依存は各ディレクトリの `requirements.txt` で固定 | 2026-10-06 |
@@ -185,3 +185,10 @@ FastAPI / uvicorn は全サンプルで 0.142.2 / 0.54.0 に揃えた(`tools/ext
 | トレース設定 | `workflow: support-triage` の Langfuse trace-config(検証後に `enabled: false`。Langfuse を `ops/langfuse` で起動し直して有効化すれば「In use」を確認できる) | - |
 
 外部サービス(`tools/internal_api` 8102、`tools/mcp_server` 8103、`tools/external_kb` 8101)は手元のプロセスで、Dify 側の登録だけが残る。これらに依存するアプリを GUI で動かすときは先に起動する。Service API キーと MCP / Webhook の URL はリポジトリに置いていない。
+
+## 2026-10-27: 検証モデルを qwen3:8b に変更
+
+- Ollama 0.40.11 の `qwen3:8b` + `nomic-embed-text` で再検証した(Dify 1.17.1、langgenius/ollama 1.0.3)
+- qwen3 は思考モードが既定で有効のため、全 DSL のモデル設定に `think: false` を追加した(無いと応答に `<think>` が混ざる)
+- 再検証で確認: チャットボット、ワークフロー各種(構造化出力は 3 回連続 bool)、チャットフロー(多ターン、人間の入力)、RAG、レガシー Agent のツール使用、カスタムツール 2 連続呼び出し、hybrid、新 Agent の基本応答
+- 未完: webhook 起動の完走(環境要因: 検証中の Docker Desktop 手動停止の後遺症で、非同期実行からの Ollama 接続のみタイムアウト。機構自体は受理→実行→記録まで動作)と、新 Agent のファイル書き込みの完走

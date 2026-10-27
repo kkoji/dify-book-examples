@@ -269,9 +269,10 @@ workflow:
         instruction: 社内の問い合わせ窓口に届いた文章を、最も近い種別に分類してください。
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         query_variable_selector:
         - sys
@@ -332,9 +333,10 @@ workflow:
             size: 10
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         prompt_template:
         - role: system

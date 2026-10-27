@@ -32,10 +32,11 @@ model_config:
     enabled: false
   model:
     completion_params:
+      think: false
       stop: []
       temperature: 0.3
     mode: chat
-    name: qwen2.5:7b
+    name: qwen3:8b
     provider: langgenius/ollama/ollama
   more_like_this:
     enabled: false

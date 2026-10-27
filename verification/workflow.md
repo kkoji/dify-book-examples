@@ -61,3 +61,8 @@
 
 - `python/run_workflow.py` を修正: `partial-succeeded` を失敗扱いにしない(警告を出して `outputs` を表示)。`--input NAME=VALUE` で追加の入力変数を渡せるようにした
 - 再検証: `workflow-control-flow: error-handling`(40403ae8-…)に対して `run_workflow.py "ノート PC が起動しません" --input simulate_error=code` → `status: partial-succeeded`、`outputs` に `error_type: CodeExecutionError` と fallback の回答。`simulate_error` 無しでは `succeeded`。いずれも終了コード 0
+
+## 2026-10-27 qwen3:8b で再検証
+
+- support-triage を 3 回実行し、すべて succeeded。`category` は毎回 IT、`needs_human` は毎回 boolean(qwen2.5:7b の型揺れは再現せず)
+- iteration-batch、loop-refine(score 5 のまま最大 3 回で終了)、error-handling(simulate_error=none は succeeded、=code は partial-succeeded で例外分岐に流れた)も確認

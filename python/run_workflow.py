@@ -5,7 +5,7 @@
     python run_workflow.py --var questions "1 行目\n2 行目"   # 入力変数名を変える
 
 環境変数(.env に書く): DIFY_API_BASE、DIFY_APP_API_KEY
-検証: Dify 1.17.1(セルフホスト)、Ollama qwen2.5:7b、httpx 0.28.1
+検証: Dify 1.17.1(セルフホスト)、Ollama qwen3:8b、httpx 0.28.1
 """
 
 import argparse

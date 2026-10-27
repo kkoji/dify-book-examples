@@ -11,7 +11,7 @@ POST /v1/workflows/{workflow_id}/run で公開済みの特定バージョンを�
     python eval/run_eval.py --judge --out result.json
 
 環境変数(.env に書く): DIFY_API_BASE、DIFY_APP_API_KEY(対象 Workflow アプリのキー)
-検証: Dify 1.17.1(セルフホスト)、Ollama qwen2.5:7b、httpx 0.28.1、PyYAML 6.0.2
+検証: Dify 1.17.1(セルフホスト)、Ollama qwen3:8b、httpx 0.28.1、PyYAML 6.0.2
 """
 
 import argparse

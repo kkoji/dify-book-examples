@@ -5,7 +5,7 @@
     python chat_multiturn.py "1 ターン目" "2 ターン目"   # 任意の発話を順に送る
 
 環境変数(.env に書く): DIFY_API_BASE、DIFY_APP_API_KEY
-検証: Dify 1.17.1(セルフホスト)、Ollama qwen2.5:7b、httpx 0.28.1
+検証: Dify 1.17.1(セルフホスト)、Ollama qwen3:8b、httpx 0.28.1
 """
 
 import json

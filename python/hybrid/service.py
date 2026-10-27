@@ -7,7 +7,7 @@ workflow 章の support-triage では Question Classifier ノードが問い合�
     POST /classify  {"question": "..."}  ->  {"category": "経費" | "勤怠" | "IT" | "その他", "raw": "..."}
 
 起動: .venv/bin/uvicorn service:app --host 0.0.0.0 --port 8104
-検証: Dify 1.17.1、langgraph 1.2.12、langchain-ollama 1.1.0、Ollama qwen2.5:7b
+検証: Dify 1.17.1、langgraph 1.2.12、langchain-ollama 1.1.0、Ollama qwen3:8b
 """
 
 from __future__ import annotations
@@ -26,7 +26,7 @@ from pydantic import BaseModel, Field
 load_dotenv(Path(__file__).with_name(".env"))
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2.5:7b")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen3:8b")
 
 # support-triage の Question Classifier と同じ 4 クラス。説明文もそのまま流用する
 CATEGORIES = {

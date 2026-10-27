@@ -1,9 +1,9 @@
 """簡易 LLM-as-a-judge。回答案が問い合わせに対して妥当かを 1〜5 で採点する。
 
 Dify の外で動く評価用のモデル呼び出しなので、Ollama の API(/api/chat)を直接叩く。
-採点モデルは本番で使うモデルと分けるのが普通だが、ここでは検証環境に合わせて qwen2.5:7b を使う。
+採点モデルは本番で使うモデルと分けるのが普通だが、ここでは検証環境に合わせて qwen3:8b を使う。
 
-環境変数: OLLAMA_BASE(既定 http://localhost:11434)、JUDGE_MODEL(既定 qwen2.5:7b)
+環境変数: OLLAMA_BASE(既定 http://localhost:11434)、JUDGE_MODEL(既定 qwen3:8b)
 """
 
 import json
@@ -12,7 +12,7 @@ import os
 import httpx
 
 OLLAMA_BASE = os.environ.get("OLLAMA_BASE", "http://localhost:11434")
-JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "qwen2.5:7b")
+JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "qwen3:8b")
 
 PROMPT = """あなたは社内ヘルプデスクの回答品質を採点する審査員です。
 次の問い合わせと回答案を読み、回答案を 1〜5 の整数で採点してください。

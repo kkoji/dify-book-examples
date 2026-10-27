@@ -241,9 +241,10 @@ workflow:
         instruction: 社内の問い合わせ窓口に届いた文章を、最も近い種別に分類してください。
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         query_variable_selector:
         - sys
@@ -270,9 +271,10 @@ workflow:
         instruction: ユーザーが自分の所属部署を名乗っていれば、その部署名だけを抜き出してください。名乗っていなければ空文字にしてください。
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         parameters:
         - description: 'ユーザーが名乗った所属部署(例: 経理部)。本文に無ければ空文字'
@@ -423,9 +425,10 @@ workflow:
             size: 10
         model:
           completion_params:
+            think: false
             temperature: 0.1
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         prompt_template:
         - role: system

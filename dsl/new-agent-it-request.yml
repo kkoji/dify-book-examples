@@ -86,7 +86,7 @@ agent_packages:
         text_to_speech: null
       model:
         credential_ref: null
-        model: qwen2.5:7b
+        model: qwen3:8b
         model_provider: langgenius/ollama/ollama
         model_settings:
           frequency_penalty: null

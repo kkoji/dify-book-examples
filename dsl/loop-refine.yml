@@ -221,9 +221,10 @@ workflow:
         loop_id: loop
         model:
           completion_params:
+            think: false
             temperature: 0.3
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         prompt_template:
         - role: system
@@ -274,9 +275,10 @@ workflow:
         loop_id: loop
         model:
           completion_params:
+            think: false
             temperature: 0.3
           mode: chat
-          name: qwen2.5:7b
+          name: qwen3:8b
           provider: langgenius/ollama/ollama
         prompt_template:
         - role: system

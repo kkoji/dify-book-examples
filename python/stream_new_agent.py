@@ -7,7 +7,7 @@ SSE に流れるイベント(agent_thought、agent_message、message、message_e
     python stream_new_agent.py "依頼文" --raw                                   # 全イベントの生 JSON を表示
 
 環境変数(.env に書く): DIFY_API_BASE、DIFY_APP_API_KEY(新 Agent の Access Point で発行した app- キー)
-検証: Dify 1.17.1(セルフホスト)、Ollama qwen2.5:7b、httpx 0.28.1
+検証: Dify 1.17.1(セルフホスト)、Ollama qwen3:8b、httpx 0.28.1
 """
 
 import argparse

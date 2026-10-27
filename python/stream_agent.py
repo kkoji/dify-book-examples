@@ -6,7 +6,7 @@ agent_thought(ツール呼び出し)と agent_message(回答の断片)を SSE �
     python stream_agent.py "続きの質問" --conversation <conversation_id>   # 会話を継続
 
 環境変数(.env に書く): DIFY_API_BASE、DIFY_APP_API_KEY
-検証: Dify 1.17.1(セルフホスト)、Ollama qwen2.5:7b、httpx 0.28.1
+検証: Dify 1.17.1(セルフホスト)、Ollama qwen3:8b、httpx 0.28.1
 """
 
 import argparse
