@@ -191,4 +191,6 @@ FastAPI / uvicorn は全サンプルで 0.142.2 / 0.54.0 に揃えた(`tools/ext
 - Ollama 0.40.11 の `qwen3:8b` + `nomic-embed-text` で再検証した(Dify 1.17.1、langgenius/ollama 1.0.3)
 - qwen3 は思考モードが既定で有効のため、全 DSL のモデル設定に `think: false` を追加した(無いと応答に `<think>` が混ざる)
 - 再検証で確認: チャットボット、ワークフロー各種(構造化出力は 3 回連続 bool)、チャットフロー(多ターン、人間の入力)、RAG、レガシー Agent のツール使用、カスタムツール 2 連続呼び出し、hybrid、新 Agent の基本応答
-- 未完: webhook 起動の完走(環境要因: 検証中の Docker Desktop 手動停止の後遺症で、非同期実行からの Ollama 接続のみタイムアウト。機構自体は受理→実行→記録まで動作)と、新 Agent のファイル書き込みの完走
+- 新 Agent のファイル書き込みも成功(2026-10-27、41.5 秒。qwen2.5 で見られた `-e` の混入は再現せず)
+- 補足(2026-10-30): `python/hybrid/.env.example` の `OLLAMA_MODEL` が `qwen2.5:7b` のまま残っており、上の hybrid の確認では分類サービス(`service.py`)が `qwen2.5:7b` で動いていたとみられる。`.env.example` を直し、hybrid の 3 経路を Ollama 0.40.13 の `qwen3:8b` で再検証して成功した(詳細は verification/limits-migration.md)
+- 未完: webhook 起動の完走のみ(環境要因。詳細と再試行手順は verification/tools-mcp.md)

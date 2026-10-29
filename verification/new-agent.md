@@ -60,3 +60,10 @@
 ## 調査メモへの追記
 
 - `research/dify-for-code-first-engineers/agent.md` 末尾に「追記(2026-10-05)」として、Console API のエンドポイント、`agent_soul.model` の形、SSE の実測、DSL の往復、環境変数の置き場所を追加した
+
+## 2026-10-27 qwen3:8b で再検証
+
+- DSL(qwen3:8b 版)を再インポートし、Console API で公開と API 有効化、キー発行(手順は 10/05 と同じ)
+- 単純な依頼: 成功。agent_thought と agent_message が交互 → message → message_end の順(本文どおり)。2,780 トークン、20 秒
+- ファイル書き込み + cat: 成功。`shell_run` が `echo "## 申請者\n小島\n…" > it_request_draft.md && cat …` を実行し、ファイルは正しい改行で作成された(サンドボックスの sh は echo のエスケープを解釈する)。qwen2.5 の「`-e` が残る」粗さは再現せず。6,626 トークン、41.5 秒
+- 注意: ランナーが宙吊りの時間帯は `completion_request_error`(host.docker.internal への read timeout)になる。Ollama 本体の再起動で解消

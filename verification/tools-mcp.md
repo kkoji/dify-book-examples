@@ -103,3 +103,12 @@ Service API キーと MCP 公開 URL、Webhook URL は scratchpad(`tm_agent_apik
 - dsl-versioning 章: カスタムツール(`type: api`)とワークフローツールは `provider_id` が UUID で、別ワークスペースではそのまま解決できない。Webhook Trigger の `webhook_url` はエクスポートで空になりインポート先で再採番される
 - service-api 章: 本章の MCP 公開 URL と Webhook URL は `python/.env.example` に `DIFY_MCP_SERVER_URL` / `DIFY_WEBHOOK_URL` として追記した。`requirements.txt` の `mcp==1.30.0` も本章の追記
 - new-agent 章 / agent 章: Agent ノードに MCP ツールを持たせる検証は行っていない(カスタムツールのみ)
+
+## 2026-10-27 qwen3:8b 再検証(webhook は未完)
+
+- カスタムツール: 成功。社員 E001 の照会 → ノート PC 申請(REQ-0001)が 1 文の依頼で 2 ツール連続で呼ばれた(qwen2.5 と同じ挙動)
+- MCP 経由の呼び出し: 未再検証(機構はモデル非依存)
+- Webhook 起動: 未完。受理(200)→ 実行キュー投入 → ログ記録までは動くが、この日の検証環境では実行が LLM 呼び出しで止まり続けた。原因は Ollama ランナーの宙吊り(検証中の Docker Desktop 手動停止の後遺症で、タイムアウト切断のたびに再発)と、終盤は実行が開始されない状態(スタック再作成でも解消せず、原因未特定)。機構自体は 10/05 に qwen2.5 で完走済み
+- 残検証: 環境がきれいな状態(Mac または Ollama と Docker の再起動直後)で webhook を 1 回流し、succeeded を確認する
+
+<!-- VERIFY: 著者が環境のきれいな日に webhook の完走を 1 回確認する(手順: POST http://localhost/triggers/webhook/<id> に {"question": "..."}。結果はアプリのログ画面) -->

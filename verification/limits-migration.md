@@ -52,6 +52,15 @@
 - 注意: このアプリはツール登録を削除済みなので、著者が GUI で確認するときは Workflow as Tool を登録し直すと再び無限に入れ子になる。確認は「設定 UI で自分自身を選べるか」までにとどめること
 - `MAX_VARIABLE_SIZE` は、コード上ノード出力の経路に検査が無く(`api/factories/variable_factory.py` の環境変数・会話変数生成のみ)、`.env` を変えずに再現できる形が見つからなかったため TODO のまま。`WORKFLOW_MAX_EXECUTION_STEPS` は `.env` 変更が要るため未実施
 
+## 再検証(2026-10-30、qwen3:8b)
+
+- きっかけ: `python/hybrid/.env.example` の `OLLAMA_MODEL` が `qwen2.5:7b` のまま残っていた。`service.py` は `.env` の値を優先するため、2026-10-27 の再検証でも分類サービスは `qwen2.5:7b` で動いていたとみられる。`.env.example` を `qwen3:8b` に直して再検証した
+- 環境: Dify 1.17.1、Ollama 0.40.13 の `qwen3:8b`、Python 3.12.10(`python/hybrid/.venv`、依存は変更なし)。手元の `.env` は編集せず、`OLLAMA_MODEL=qwen3:8b` を環境変数で渡して起動した(`load_dotenv` は既存の環境変数を上書きしない)
+- サンプル 1(service.py 単体): `POST /classify` に 4 件。タクシー代 → 経費、PC の電源 → IT、有給休暇 → 勤怠、観葉植物 → その他。4 件とも `raw` は種別名だけで、`<think>` は混ざらなかった。1 件あたり 3.5〜9.5 秒(初回はモデル読み込みを含む)
+- サンプル 1(Dify 経由): api コンテナから ssrf_proxy 経由で `host.docker.internal:8104/classify` を呼んで 200(category=IT)。`limits-migration: hybrid-workflow` の下書き実行(Console API)で 2 件とも `succeeded`、5 ステップ、`classifier_status: 200`。タクシー代 → 経費(6.87 秒)、有給休暇 → 勤怠(5.47 秒)
+- サンプル 2(langgraph_calls_dify.py): タクシー代 → `succeeded`、経費、`needs_human: false` → `auto_reply`(14.2 秒)。観葉植物 → `succeeded`、その他、`needs_human: true` → `escalate`(4.2 秒)
+- 結果: 成功
+
 ## 調査メモへの追記
 
 - `research/dify-for-code-first-engineers/limits-migration.md` に 7 行追記: 動的グラフが無いことの根拠(graphon `Graph.init` / `GraphEngine` のコマンド種別 / Service API ルート一覧)、`ExecutionLimitsLayer` の中断理由文字列、`MAX_VARIABLE_SIZE` の検査箇所、`WORKFLOW_CALL_MAX_DEPTH` が効かない実機結果と原因、Workflow as Tool の版固定と `synced`、HTTP Request ノードのエディタ初期値、ハイブリッド構成の実機結果

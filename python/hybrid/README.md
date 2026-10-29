@@ -40,5 +40,5 @@ Docker Compose の Dify から到達させるので、HTTP Request ノードの 
 
 ## 検証
 
-- 2026-10-05、Dify 1.17.1(セルフホスト)、Ollama `qwen3:8b`、langgraph 1.2.12 / langchain-ollama 1.1.0 / fastapi 0.142.2、Python 3.12.10
+- 2026-10-30、Dify 1.17.1(セルフホスト)、Ollama 0.40.13 の `qwen3:8b`、langgraph 1.2.12 / langchain-ollama 1.1.0 / fastapi 0.142.2、Python 3.12.10
 - 詳細は `examples/dify-for-code-first-engineers/verification/limits-migration.md`
